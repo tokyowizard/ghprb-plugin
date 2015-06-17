@@ -120,7 +120,24 @@ public class GhprbBuilds {
         StringBuilder msg = new StringBuilder();
 
         String publishedURL = GhprbTrigger.getDscp().getPublishedURL();
-        if (publishedURL != null && !publishedURL.isEmpty()) {
+
+
+        String postComment = null;
+        if (state == GHCommitState.SUCCESS) {
+            if (trigger.getMsgSuccess() != null && !trigger.getMsgSuccess().isEmpty()) {
+                postComment = trigger.getMsgSuccess();
+            } else if (GhprbTrigger.getDscp().getMsgSuccess(build) != null && !GhprbTrigger.getDscp().getMsgSuccess(build).isEmpty()) {
+                postComment = GhprbTrigger.getDscp().getMsgSuccess(build);
+            }
+        } else if (state == GHCommitState.FAILURE) {
+            if (trigger.getMsgFailure() != null && !trigger.getMsgFailure().isEmpty()) {
+                postComment = trigger.getMsgFailure();
+            } else if (GhprbTrigger.getDscp().getMsgFailure(build) != null && !GhprbTrigger.getDscp().getMsgFailure(build).isEmpty()) {
+                postComment = GhprbTrigger.getDscp().getMsgFailure(build);
+            }
+        }
+
+        if (publishedURL != null && !publishedURL.isEmpty() && !postComment.contains("no comment")) {
             String commentFilePath = trigger.getCommentFilePath();
             
             if (commentFilePath != null && !commentFilePath.isEmpty()) {
